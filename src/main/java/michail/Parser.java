@@ -1,5 +1,6 @@
 package michail;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Parser {
@@ -20,8 +21,7 @@ public class Parser {
         this.index = 0;
         stack.push("#");
         stack.push("S");
-        String sentenceForm = "S → ";
-        String prevChoice = "";
+        String sentenceForm = "S";
 
         while (!stack.isEmpty()) {
             String top = stack.peek();
@@ -51,8 +51,10 @@ public class Parser {
                 ProductionExpander.expand(production, stack);
 
                 System.out.println("Applying production: " + production);
-                sentenceForm += production.substring(4) + prevChoice + " -> ";
-                prevChoice = production.substring(4);
+
+                ArrayList<String> stackCopy = new ArrayList<>(stack);
+                stackCopy.removeFirst();
+                sentenceForm += " → " + finalTerminals + String.join("", stackCopy.reversed());
             }
 
             System.out.println("------------------------");
