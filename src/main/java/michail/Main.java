@@ -1,0 +1,9 @@
+package michail;
+
+public class Main {
+    public static void main(String[] args) {
+        ParsingTable table = new ParsingTable();
+        Parser parser = new Parser(table);
+        parser.parse("ab");
+    }
+}
