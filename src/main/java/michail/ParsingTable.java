@@ -16,13 +16,14 @@ class ParsingTable {
     private void initializeTable() {
         table.put(new Pair<>("S", "a"), List.of("S → ABC"));
         table.put(new Pair<>("S", "b"), List.of("S → ABC"));
-        table.put(new Pair<>("A", "a"), List.of("A → BB"));
-        table.put(new Pair<>("A", "b"), List.of("A → BB"));
-        table.put(new Pair<>("A", "#"), List.of("A → ε"));
-        table.put(new Pair<>("B", "a"), List.of("B → a"));
-        table.put(new Pair<>("B", "b"), List.of("B → CC"));
-        table.put(new Pair<>("C", "a"), List.of("C → AA"));
-        table.put(new Pair<>("C", "b"), List.of("C → b"));
+        table.put(new Pair<>("S", "c"), List.of("S → ABC"));
+        table.put(new Pair<>("A", "a"), List.of("A → aBB"));
+        table.put(new Pair<>("A", "b"), List.of("A → ε"));
+        table.put(new Pair<>("A", "c"), List.of("A → ε"));
+        table.put(new Pair<>("B", "b"), List.of("B → bB"));
+        table.put(new Pair<>("B", "c"), List.of("B → c"));
+        table.put(new Pair<>("C", "a"), List.of("C → aC"));
+        table.put(new Pair<>("C", "#"), List.of("C → ε"));
     }
 
     public List<String> getApplicableProductions(String nonTerminal, String terminal) {

@@ -4,34 +4,26 @@ import java.util.*;
 
 public class Parser {
     private ParsingTable parsingTable;
-    private Stack<ParserState> stateStack;
+    private Stack<String> stack;
     private String input;
+    private int index;
+    private String finalTerminals;
 
     public Parser(ParsingTable parsingTable) {
         this.parsingTable = parsingTable;
-        this.stateStack = new Stack<>();
+        this.stack = new Stack<>();
+        this.finalTerminals = "";
     }
 
     public boolean parse(String input) {
         this.input = input;
-        stateStack.push(new ParserState(List.of("#", "S"), 0, new ArrayList<>(), ""));
+        this.index = 0;
+        stack.push("#");
+        stack.push("S");
+        String sentenceForm = "S → ";
+        String prevChoice = "";
 
-        while (!stateStack.isEmpty()) {
-            ParserState currentState = stateStack.pop();
-            Stack<String> stack = currentState.getStack();
-            int index = currentState.getIndex();
-            List<String> productionSequence = currentState.getProductionSequence();
-            String finalTerminals = currentState.getFinalTerminals();
-
-            if (isParsingFinished(index, stack)) {
-                printParsingResult(stack, productionSequence);
-                return true;
-            }
-
-            if (isInputExhausted(index, stack)) {
-                continue;
-            }
-
+        while (!stack.isEmpty()) {
             String top = stack.peek();
 
             printCurrentState(stack, index, top);
@@ -41,30 +33,37 @@ public class Parser {
                     stack.pop();
                     index++;
                     finalTerminals += top;
-                    continue;
+                } else {
+                    System.out.println("Parsing failed. Unexpected terminal: " + getInputSymbol(index));
+                    return false;
                 }
             } else {
                 List<String> applicableProductions = parsingTable.getApplicableProductions(top, getInputSymbol(index));
 
-                for (String production : applicableProductions) {
-                    Stack<String> newStack = new Stack<>();
-                    newStack.addAll(stack);
-                    newStack.pop();
-
-                    ProductionExpander.expand(production, newStack);
-
-                    List<String> newProductionSequence = new ArrayList<>(productionSequence);
-                    newProductionSequence.add(production);
-
-                    System.out.println("Applying production: " + production);
-                    stateStack.push(new ParserState(newStack, index, newProductionSequence, finalTerminals));
+                if (applicableProductions.isEmpty()) {
+                    System.out.println("Parsing failed. No applicable production for non-terminal: " + top);
+                    return false;
                 }
+
+                String production = applicableProductions.get(0);
+                stack.pop();
+
+                ProductionExpander.expand(production, stack);
+
+                System.out.println("Applying production: " + production);
+                sentenceForm += production.substring(4) + prevChoice + " -> ";
+                prevChoice = production.substring(4);
             }
 
             System.out.println("------------------------");
+
+            if (isParsingFinished(index, stack)) {
+                printParsingResult(stack, sentenceForm);
+                return true;
+            }
         }
 
-        System.out.println("No more states to explore. Parsing failed.");
+        System.out.println("Parsing failed. Unexpected end of input.");
         return false;
     }
 
@@ -72,14 +71,10 @@ public class Parser {
         return index == input.length() && stack.size() == 1 && stack.peek().equals("#");
     }
 
-    private void printParsingResult(Stack<String> stack, List<String> productionSequence) {
+    private void printParsingResult(Stack<String> stack, String sentenceForm) {
         System.out.println("Parsing finished.");
         System.out.println("Final stack: " + stack);
-        System.out.println("Production sequence: " + String.join(" → ", productionSequence));
-    }
-
-    private boolean isInputExhausted(int index, Stack<String> stack) {
-        return index == input.length() && stack.size() > 1;
+        System.out.println("Production sequence: " + sentenceForm);
     }
 
     private void printCurrentState(Stack<String> stack, int index, String top) {

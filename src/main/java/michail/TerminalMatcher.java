@@ -2,7 +2,7 @@ package michail;
 
 class TerminalMatcher {
     public static boolean isTerminal(String symbol) {
-        return symbol.equals("a") || symbol.equals("b") || symbol.equals("#");
+        return symbol.equals("a") || symbol.equals("b") || symbol.equals("c") || symbol.equals("#");
     }
 
     public static boolean match(String terminal, String input, int index) {
