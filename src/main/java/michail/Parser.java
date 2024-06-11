@@ -9,10 +9,12 @@ public class Parser {
     private int index;
     private String finalTerminals;
     private String sentenceForm;
+    private Stack<Integer> semanticActions;
 
     public Parser(ParsingTable parsingTable) {
         this.parsingTable = parsingTable;
         this.stack = new Stack<>();
+        this.semanticActions = new Stack<>();
     }
 
     public boolean parse(String input) {
@@ -23,6 +25,7 @@ public class Parser {
         stack.push("S");
         this.finalTerminals = "";
         this.sentenceForm = "S";
+        this.semanticActions = new Stack<>();
 
         while (!stack.isEmpty()) {
             String top = stack.peek();
@@ -52,7 +55,18 @@ public class Parser {
 
                 stack.pop();
 
-                ProductionExpander.expand(production, stack);
+                String[] symbols = production.split("→")[1].trim().split("");
+                for (int i = symbols.length - 1; i >= 0; i--) {
+                    String symbol = symbols[i];
+                    if (!symbol.equals("ε")) {
+                        if (Character.isDigit(symbol.charAt(0))) {
+                            int action = Integer.parseInt(symbol);
+                            semanticActions.push(action);
+                        } else {
+                            stack.push(symbol);
+                        }
+                    }
+                }
 
                 System.out.println("Applying production: " + production);
 
@@ -66,6 +80,7 @@ public class Parser {
             if (isParsingFinished(index, stack)) {
                 System.out.println("Parsing finished successfully.");
                 printParsingResult();
+                printSemanticActions();
                 return true;
             }
         }
@@ -77,6 +92,36 @@ public class Parser {
 
     private boolean isParsingFinished(int index, Stack<String> stack) {
         return index == input.length() && stack.size() == 1 && stack.peek().equals("#");
+    }
+
+    private void printSemanticActions() {
+        System.out.println("Semantic Actions: " + semanticActions);
+        System.out.println("Semantic Actions (interpreted):");
+        for (int action : semanticActions) {
+            switch (action) {
+                case 0:
+                    System.out.println("LOAD reg, var;");
+                    break;
+                case 1:
+                    System.out.println("STORE reg, var;");
+                    break;
+                case 2:
+                    System.out.println("ADD reg1, reg2;");
+                    break;
+                case 3:
+                    System.out.println("MUL reg1, reg2;");
+                    break;
+                case 4:
+                    System.out.println("CMP reg1, reg2;");
+                    break;
+                case 5:
+                    System.out.println("JMP label;");
+                    break;
+                case 6:
+                    System.out.println("CALL function;");
+                    break;
+            }
+        }
     }
 
     private void printParsingResult() {

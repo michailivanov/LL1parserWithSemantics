@@ -12,16 +12,16 @@ class ParsingTable {
     }
 
     private void initializeTable() {
-        table.put(new Pair<>("S", "a"), "S → ABC");
-        table.put(new Pair<>("S", "b"), "S → ABC");
-        table.put(new Pair<>("S", "c"), "S → ABC");
-        table.put(new Pair<>("A", "a"), "A → aBB");
-        table.put(new Pair<>("A", "b"), "A → ε");
-        table.put(new Pair<>("A", "c"), "A → ε");
-        table.put(new Pair<>("B", "b"), "B → bB");
-        table.put(new Pair<>("B", "c"), "B → c");
-        table.put(new Pair<>("C", "a"), "C → aC");
-        table.put(new Pair<>("C", "#"), "C → ε");
+        table.put(new Pair<>("S", "a"), "S → AB0C");
+        table.put(new Pair<>("S", "b"), "S → AB0C");
+        table.put(new Pair<>("S", "c"), "S → AB0C");
+        table.put(new Pair<>("A", "a"), "A → a1BB");
+        table.put(new Pair<>("A", "b"), "A → 2ε");
+        table.put(new Pair<>("A", "c"), "A → 2ε");
+        table.put(new Pair<>("B", "b"), "B → bB3");
+        table.put(new Pair<>("B", "c"), "B → c4");
+        table.put(new Pair<>("C", "a"), "C → 5aC");
+        table.put(new Pair<>("C", "#"), "C → ε6");
     }
 
     public String getProduction(String nonTerminal, String terminal) {
