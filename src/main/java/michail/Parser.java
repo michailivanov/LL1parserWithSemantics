@@ -13,14 +13,15 @@ public class Parser {
     public Parser(ParsingTable parsingTable) {
         this.parsingTable = parsingTable;
         this.stack = new Stack<>();
-        this.finalTerminals = "";
     }
 
     public boolean parse(String input) {
         this.input = input;
         this.index = 0;
+        stack = new Stack<>();
         stack.push("#");
         stack.push("S");
+        this.finalTerminals = "";
         this.sentenceForm = "S";
 
         while (!stack.isEmpty()) {
@@ -44,7 +45,7 @@ public class Parser {
 
                 if (production == null) {
                     System.out.println("------------------------");
-                    System.out.println("Parsing failed. No production for non-terminal: " + top);
+                    System.out.println("Parsing failed. No acceptable production for non-terminal: " + top);
                     printParsingResult();
                     return false;
                 }
@@ -86,6 +87,7 @@ public class Parser {
         } else {
             System.out.println("Production sequence: " + sentenceForm + " → ERROR");
         }
+
     }
 
     private void printCurrentState(Stack<String> stack, int index, String top) {
