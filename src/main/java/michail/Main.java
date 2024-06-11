@@ -33,7 +33,8 @@ public class Main {
             }
             else if(inputString.isEmpty())
             {
-                System.out.println("A string is empty! Try again.");
+                System.out.println("A string is empty!");
+                System.out.println("RESULT: THE STRING IS INVALID\n");
                 continue;
             }
             else {

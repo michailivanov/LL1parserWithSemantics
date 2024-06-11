@@ -54,13 +54,22 @@ public class Parser {
                         throw new RuntimeException("ERROR: there's no such semantic number: " + semanticNum);
                     }
                 } else {
-                    String production = parsingTable.getProduction(top, getInputSymbol(index));
+                    String inputSymbol = getInputSymbol(index);
+                    String production = parsingTable.getProduction(top, inputSymbol);
 
                     if (production == null) {
-                        System.out.println("------------------------");
-                        System.out.println("Parsing failed. No acceptable production for non-terminal: " + top);
-                        printParsingResult();
-                        return false;
+                        if(TerminalMatcher.isTerminal(inputSymbol)){
+                            System.out.println("------------------------");
+                            System.out.println("Parsing failed. No acceptable production for non-terminal: " + top);
+                            printParsingResult();
+                            return false;
+                        } else {
+                            System.out.println("------------------------");
+                            System.out.println("Parsing failed. \"" + inputSymbol + "\" is not from the alphabet!");
+                            printParsingResult();
+                            return false;
+                        }
+
                     }
 
                     stack.pop();
