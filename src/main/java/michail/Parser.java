@@ -1,6 +1,5 @@
 package michail;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Parser {
@@ -9,6 +8,7 @@ public class Parser {
     private String input;
     private int index;
     private String finalTerminals;
+    private String sentenceForm;
 
     public Parser(ParsingTable parsingTable) {
         this.parsingTable = parsingTable;
@@ -21,7 +21,7 @@ public class Parser {
         this.index = 0;
         stack.push("#");
         stack.push("S");
-        String sentenceForm = "S";
+        this.sentenceForm = "S";
 
         while (!stack.isEmpty()) {
             String top = stack.peek();
@@ -34,18 +34,21 @@ public class Parser {
                     index++;
                     finalTerminals += top;
                 } else {
+                    System.out.println("------------------------");
                     System.out.println("Parsing failed. Unexpected terminal: " + getInputSymbol(index));
+                    printParsingResult();
                     return false;
                 }
             } else {
-                List<String> applicableProductions = parsingTable.getApplicableProductions(top, getInputSymbol(index));
+                String production = parsingTable.getProduction(top, getInputSymbol(index));
 
-                if (applicableProductions.isEmpty()) {
-                    System.out.println("Parsing failed. No applicable production for non-terminal: " + top);
+                if (production == null) {
+                    System.out.println("------------------------");
+                    System.out.println("Parsing failed. No production for non-terminal: " + top);
+                    printParsingResult();
                     return false;
                 }
 
-                String production = applicableProductions.get(0);
                 stack.pop();
 
                 ProductionExpander.expand(production, stack);
@@ -60,12 +63,14 @@ public class Parser {
             System.out.println("------------------------");
 
             if (isParsingFinished(index, stack)) {
-                printParsingResult(stack, sentenceForm);
+                System.out.println("Parsing finished successfully.");
+                printParsingResult();
                 return true;
             }
         }
 
         System.out.println("Parsing failed. Unexpected end of input.");
+        printParsingResult();
         return false;
     }
 
@@ -73,10 +78,14 @@ public class Parser {
         return index == input.length() && stack.size() == 1 && stack.peek().equals("#");
     }
 
-    private void printParsingResult(Stack<String> stack, String sentenceForm) {
-        System.out.println("Parsing finished.");
+    private void printParsingResult() {
         System.out.println("Final stack: " + stack);
-        System.out.println("Production sequence: " + sentenceForm);
+        System.out.println("Input was: " + input);
+        if(stack.size() == 1) { // [#]
+            System.out.println("Production sequence: " + sentenceForm);
+        } else {
+            System.out.println("Production sequence: " + sentenceForm + " → ERROR");
+        }
     }
 
     private void printCurrentState(Stack<String> stack, int index, String top) {
