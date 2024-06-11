@@ -44,35 +44,41 @@ public class Parser {
                     return false;
                 }
             } else {
-                String production = parsingTable.getProduction(top, getInputSymbol(index));
+                if (Character.isDigit(top.charAt(0))) {
+                    int semanticNum = Character.getNumericValue(top.charAt(0));
+                    if (semanticNum <= 6 && semanticNum >= 0) {
+                        stack.pop();
+                        semanticActions.push(semanticNum);
+                        System.out.println("Semantic value found: " + semanticNum);
+                    } else {
+                        throw new RuntimeException("ERROR: there's no such semantic number: " + semanticNum);
+                    }
+                } else {
+                    String production = parsingTable.getProduction(top, getInputSymbol(index));
 
-                if (production == null) {
-                    System.out.println("------------------------");
-                    System.out.println("Parsing failed. No acceptable production for non-terminal: " + top);
-                    printParsingResult();
-                    return false;
-                }
+                    if (production == null) {
+                        System.out.println("------------------------");
+                        System.out.println("Parsing failed. No acceptable production for non-terminal: " + top);
+                        printParsingResult();
+                        return false;
+                    }
 
-                stack.pop();
+                    stack.pop();
 
-                String[] symbols = production.split("→")[1].trim().split("");
-                for (int i = symbols.length - 1; i >= 0; i--) {
-                    String symbol = symbols[i];
-                    if (!symbol.equals("ε")) {
-                        if (Character.isDigit(symbol.charAt(0))) {
-                            int action = Integer.parseInt(symbol);
-                            semanticActions.push(action);
-                        } else {
+                    String[] symbols = production.split("→")[1].trim().split("");
+                    for (int i = symbols.length - 1; i >= 0; i--) {
+                        String symbol = symbols[i];
+                        if (!symbol.equals("ε")) {
                             stack.push(symbol);
                         }
                     }
+
+                    System.out.println("Applying production: " + production);
+
+                    ArrayList<String> stackCopy = new ArrayList<>(stack);
+                    stackCopy.removeFirst();
+                    sentenceForm += " → " + finalTerminals + String.join("", stackCopy.reversed());
                 }
-
-                System.out.println("Applying production: " + production);
-
-                ArrayList<String> stackCopy = new ArrayList<>(stack);
-                stackCopy.removeFirst();
-                sentenceForm += " → " + finalTerminals + String.join("", stackCopy.reversed());
             }
 
             System.out.println("------------------------");
