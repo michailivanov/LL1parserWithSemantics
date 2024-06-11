@@ -150,4 +150,50 @@ public class Parser {
     private String getInputSymbol(int index) {
         return index < input.length() ? String.valueOf(input.charAt(index)) : "#";
     }
+
+    public String generate() {
+        StringBuilder sb = new StringBuilder();
+        Stack<String> generationStack = new Stack<>();
+        generationStack.push("S");
+
+        while (!generationStack.isEmpty()) {
+            String symbol = generationStack.pop();
+            if (TerminalMatcher.isTerminal(symbol)) {
+                sb.append(symbol);
+            } else {
+                String production = getProductionForGeneration(symbol);
+                if (production != null) {
+                    String[] symbols = production.split("→")[1].trim().split("");
+                    for (int i = symbols.length - 1; i >= 0; i--) {
+                        String s = symbols[i];
+                        if (!s.equals("ε")) {
+                            generationStack.push(s);
+                        }
+                    }
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private String getProductionForGeneration(String nonTerminal) {
+        List<String> terminals = Arrays.asList("a", "b", "c", "#");
+        List<String> possibleProductions = new ArrayList<>();
+        for (String terminal : terminals) {
+            String production = parsingTable.getProduction(nonTerminal, terminal);
+            if (production != null) {
+                possibleProductions.add(production);
+            }
+        }
+
+        if (possibleProductions.isEmpty()) {
+            return null; // no valid production is found
+        }
+
+        Random random = new Random();
+        int randomIndex = random.nextInt(possibleProductions.size());
+        return possibleProductions.get(randomIndex);
+    }
+
 }

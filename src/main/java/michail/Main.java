@@ -62,8 +62,7 @@ public class Main {
             System.out.println("You entered: " + customInput);
             return customInput;
         } else if (choice == 2) {
-//            String random = parser.generate();
-            String random = "bcaaa"; // TODO
+            String random = parser.generate();
             System.out.println("Generated STRING: " + random);
             return random;
         }
